@@ -21,11 +21,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SpringCrudNotesTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) {
-                   Box(modifier = Modifier.padding(it)){
-                       HomeScrean()
-                   }
-                }
+                HomeScrean()
             }
         }
     }

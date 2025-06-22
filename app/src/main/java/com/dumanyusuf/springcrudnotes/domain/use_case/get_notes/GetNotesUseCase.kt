@@ -8,6 +8,8 @@ import com.dumanyusuf.springcrudnotes.domain.repo.NotesRepo
 import com.dumanyusuf.springcrudnotes.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 
 class GetNotesUseCase @Inject constructor(private val repo: NotesRepo) {
@@ -25,9 +27,22 @@ class GetNotesUseCase @Inject constructor(private val repo: NotesRepo) {
              } else {
                  emit(Resource.Error("Not bulunamadı"))
              }
-         } catch (e: Exception) {
-             Log.e("GetNotesUseCase", "Hata oluştu: ${e.localizedMessage}")
-             emit(Resource.Error("errorr:${e.localizedMessage}"))
+         }
+
+         catch (e: IOException) {
+             Log.e("GetNotesUseCase", "İnternet bağlantı hatası: ${e.localizedMessage}")
+             emit(Resource.Error("İnternet bağlantı hatası"))
+         }
+
+
+         catch (e: HttpException) {
+             Log.e("GetNotesUseCase", "Sunucu hatası: ${e.code()} ${e.message}")
+             emit(Resource.Error("Sunucu hatası: ${e.code()}"))
+         }
+
+         catch (e: Exception) {
+             Log.e("GetNotesUseCase", "Bilinmeyen hata: ${e.localizedMessage}")
+             emit(Resource.Error("Beklenmeyen bir hata oluştu: ${e.localizedMessage}"))
          }
      }
 

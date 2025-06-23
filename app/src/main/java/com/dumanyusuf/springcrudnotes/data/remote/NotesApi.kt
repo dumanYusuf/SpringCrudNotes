@@ -7,6 +7,7 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 
 interface NotesApi {
 
@@ -21,6 +22,13 @@ interface NotesApi {
     suspend fun deleteNote(
         @retrofit2.http.Path("id") id: Int
     ): retrofit2.Response<Unit>
+
+    @PUT("/rest/api/notes/update/{id}")
+    suspend fun updateNote(
+        @retrofit2.http.Path("id") id: Int,
+        @Body updatedNote: DtoMyNotesIU
+    ): NotesDtoItem
+
 
 
 

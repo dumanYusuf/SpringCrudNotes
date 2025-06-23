@@ -1,6 +1,9 @@
 package com.dumanyusuf.springcrudnotes.presentation.home_page_view
 
 import android.annotation.SuppressLint
+import android.os.Build
+import android.text.format.DateUtils.formatDateTime
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,6 +12,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.LaunchedEffect
@@ -22,10 +26,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.dumanyusuf.springcrudnotes.data.remote.dto.NotesDtoItem
 import com.dumanyusuf.springcrudnotes.domain.model.DtoMyNotesIU
+import com.dumanyusuf.springcrudnotes.domain.model.NoteModel
 import com.dumanyusuf.springcrudnotes.util.CustomSearchTextField
+import com.dumanyusuf.springcrudnotes.util.EditNoteDialog
 import com.dumanyusuf.springcrudnotes.util.SaveNoteDialog
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -35,6 +43,12 @@ fun HomeScrean(
     val stateNoteList = viewModel.getStateNote.collectAsState()
     var search by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
+
+    var showEditDialog by remember { mutableStateOf(false) }
+    var selectedNote by remember { mutableStateOf<DtoMyNotesIU?>(null) }
+
+    var selectedId by remember { mutableStateOf<Int>(0) }
+
 
     LaunchedEffect(Unit) {
         viewModel.loadNotes()
@@ -103,17 +117,29 @@ fun HomeScrean(
                                 it.titleNote.contains(search, ignoreCase = true) ||
                                         it.contentNote.contains(search, ignoreCase = true)
                             }) { note ->
+                                selectedId=note.id
                                 Card(
                                     modifier = Modifier.fillMaxWidth(),
                                     elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
                                 ) {
                                     Column(modifier = Modifier.padding(16.dp)) {
-                                        Text(
-                                            text = note.titleNote,
-                                            style = MaterialTheme.typography.titleMedium.copy(
-                                                fontWeight = FontWeight.Bold
+                                        Row (modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween){
+                                            Text(
+                                                text = note.titleNote,
+                                                style = MaterialTheme.typography.titleMedium.copy(
+                                                    fontWeight = FontWeight.Bold
+                                                )
                                             )
-                                        )
+                                            Icon(
+                                                modifier = Modifier
+                                                    .size(30.dp)
+                                                    .clickable {
+                                                        // burda da güncellemme işlemi olacak
+                                                        selectedNote= DtoMyNotesIU(titleNote = note.titleNote, contentNote = note.contentNote, isCompleted = note.isCompleted)
+                                                        showEditDialog=true
+                                                    },
+                                                imageVector = Icons.Default.Edit, contentDescription = "")
+                                        }
                                         Spacer(modifier = Modifier.height(6.dp))
                                         Row (modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween){
                                             Text(
@@ -121,14 +147,16 @@ fun HomeScrean(
                                                 style = MaterialTheme.typography.bodyMedium
                                             )
                                             Icon(
-                                                modifier = Modifier.size(30.dp).clickable {
-                                                    viewModel.deleteNote(note.id)
-                                                },
+                                                modifier = Modifier
+                                                    .size(30.dp)
+                                                    .clickable {
+                                                        viewModel.deleteNote(note.id)
+                                                    },
                                                 imageVector = Icons.Default.Close, contentDescription = "")
                                         }
                                         Spacer(modifier = Modifier.height(8.dp))
                                         Text(
-                                            text = note.createdAt,
+                                            text = viewModel.formatCreatedAt(note.createdAt),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = Color.Gray
                                         )
@@ -142,6 +170,29 @@ fun HomeScrean(
         }
     )
 
+
+    if (showEditDialog && selectedNote != null) {
+        EditNoteDialog(
+            initialTitle = selectedNote!!.titleNote,
+            initialContent = selectedNote!!.contentNote,
+            onDismiss = {
+                showEditDialog = false
+                selectedNote = null
+            },
+            onUpdate = { newTitle, newContent ->
+                viewModel.updateNote(
+                    id = selectedId,
+                    DtoMyNotesIU(
+                        titleNote = newTitle,
+                        contentNote = newContent,
+                        isCompleted = selectedNote!!.isCompleted
+                    )
+                )
+                showEditDialog = false
+                selectedNote = null
+            }
+        )
+    }
 
     if (showDialog) {
         SaveNoteDialog(
@@ -158,7 +209,11 @@ fun HomeScrean(
             }
         )
     }
+
+
 }
+
+
 
 
 

@@ -22,4 +22,8 @@ class NoteRepoImpl @Inject constructor(private val api:NotesApi) :NotesRepo {
     override suspend fun deleteNote(Id: Int): Response<Unit> {
         return api.deleteNote(id = Id)
     }
+
+    override suspend fun updateNote(Id: Int, dtoNotesUI: DtoMyNotesIU): NotesDtoItem {
+        return api.updateNote(Id, dtoNotesUI)
+    }
 }

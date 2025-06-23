@@ -11,5 +11,6 @@ interface NotesRepo {
     suspend fun getNotes():NotesDto
     suspend fun saveNotes(note:DtoMyNotesIU):NotesDtoItem
     suspend fun deleteNote(Id:Int):Response<Unit>
+    suspend fun updateNote(Id: Int,dtoNotesUI:DtoMyNotesIU):NotesDtoItem
 
 }

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dumanyusuf.springcrudnotes.data.remote.dto.toNoteModel
 import com.dumanyusuf.springcrudnotes.domain.model.DtoMyNotesIU
+import com.dumanyusuf.springcrudnotes.domain.use_case.delete_note.DeleteNoteUseCase
 import com.dumanyusuf.springcrudnotes.domain.use_case.get_notes.GetNotesUseCase
 import com.dumanyusuf.springcrudnotes.domain.use_case.post_use_case.SaveNoteUseCase
 import com.dumanyusuf.springcrudnotes.util.Resource
@@ -20,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getNotesUseCase: GetNotesUseCase,
-    private val saveNoteUseCase: SaveNoteUseCase
+    private val saveNoteUseCase: SaveNoteUseCase,
+    private val deleteNoteUseCase: DeleteNoteUseCase
 ) :ViewModel() {
 
 
@@ -69,6 +71,27 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
+
+    fun deleteNote(id: Int) {
+        viewModelScope.launch {
+            deleteNoteUseCase.deleteNote(id).collect { result ->
+                when (result) {
+                    is Resource.Success -> {
+                        Log.d("DeleteNote", "Başarıyla silindi.")
+                        loadNotes()
+                    }
+                    is Resource.Error -> {
+                        Log.e("DeleteNote", "Hata: ${result.message}")
+                    }
+                    is Resource.Loading -> {
+                        Log.d("DeleteNote", "Siliniyor...")
+                    }
+                }
+            }
+        }
+    }
+
 
 
 

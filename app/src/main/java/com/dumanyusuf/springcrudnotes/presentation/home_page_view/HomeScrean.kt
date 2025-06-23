@@ -1,6 +1,7 @@
 package com.dumanyusuf.springcrudnotes.presentation.home_page_view
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -120,7 +121,9 @@ fun HomeScrean(
                                                 style = MaterialTheme.typography.bodyMedium
                                             )
                                             Icon(
-                                                modifier = Modifier.size(30.dp),
+                                                modifier = Modifier.size(30.dp).clickable {
+                                                    viewModel.deleteNote(note.id)
+                                                },
                                                 imageVector = Icons.Default.Close, contentDescription = "")
                                         }
                                         Spacer(modifier = Modifier.height(8.dp))

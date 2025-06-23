@@ -4,6 +4,7 @@ import com.dumanyusuf.springcrudnotes.data.remote.dto.NotesDto
 import com.dumanyusuf.springcrudnotes.data.remote.dto.NotesDtoItem
 import com.dumanyusuf.springcrudnotes.domain.model.DtoMyNotesIU
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 
@@ -15,6 +16,12 @@ interface NotesApi {
 
     @POST("/rest/api/notes/save")
     suspend fun saveNotes(@Body note: DtoMyNotesIU):NotesDtoItem
+
+    @DELETE("/rest/api/notes/delete/{id}")
+    suspend fun deleteNote(
+        @retrofit2.http.Path("id") id: Int
+    ): retrofit2.Response<Unit>
+
 
 
 }

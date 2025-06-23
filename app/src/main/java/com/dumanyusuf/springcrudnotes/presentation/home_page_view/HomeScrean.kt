@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.dumanyusuf.springcrudnotes.util.CustomSearchTextField
+import com.dumanyusuf.springcrudnotes.util.SaveNoteDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -28,9 +29,8 @@ fun HomeScrean(
 ) {
 
     val stateNoteList = viewModel.getStateNote.collectAsState()
-
-
     var search by remember { mutableStateOf("") }
+    var showDialog by remember { mutableStateOf(false) }
 
 
     LaunchedEffect(Unit) {
@@ -48,7 +48,7 @@ fun HomeScrean(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    // TODO: Yeni not ekleme ekranına geçiş ya da başka işlem
+                    showDialog=true
                 }
             ) {
                 Text("+", style = MaterialTheme.typography.titleLarge)
@@ -120,7 +120,18 @@ fun HomeScrean(
             }
         }
     )
+
+    if (showDialog) {
+        SaveNoteDialog(
+            onDismiss = { showDialog = false },
+            onSave = { title, content ->
+                showDialog = false
+            }
+        )
+    }
+
 }
+
 
 
 

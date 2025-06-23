@@ -26,7 +26,14 @@ Notlarınızı yönetebileceğiniz basit ama işlevsel bir not uygulaması örne
 ---
 
 
-![image alt](https://github.com/dumanYusuf/SpringCrudNotes/blob/master/s1.png?raw=true)
-![image alt](https://github.com/dumanYusuf/SpringCrudNotes/blob/master/s2.png?raw=true)
-![image alt](https://github.com/dumanYusuf/SpringCrudNotes/blob/master/s3.png?raw=true)
-![image alt](https://github.com/dumanYusuf/SpringCrudNotes/blob/master/s4.png?raw=true)
+<table>
+  <tr>
+    <td><img src="https://github.com/dumanYusuf/SpringCrudNotes/blob/master/s1.png?raw=true" width="300" /></td>
+    <td><img src="https://github.com/dumanYusuf/SpringCrudNotes/blob/master/s2.png?raw=true" width="300" /></td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/dumanYusuf/SpringCrudNotes/blob/master/s3.png?raw=true" width="300" /></td>
+    <td><img src="https://github.com/dumanYusuf/SpringCrudNotes/blob/master/s4.png?raw=true" width="300" /></td>
+  </tr>
+</table>
+

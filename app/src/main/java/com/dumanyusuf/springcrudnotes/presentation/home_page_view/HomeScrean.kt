@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.LaunchedEffect
@@ -18,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.dumanyusuf.springcrudnotes.domain.model.DtoMyNotesIU
 import com.dumanyusuf.springcrudnotes.util.CustomSearchTextField
 import com.dumanyusuf.springcrudnotes.util.SaveNoteDialog
 
@@ -27,11 +31,9 @@ import com.dumanyusuf.springcrudnotes.util.SaveNoteDialog
 fun HomeScrean(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-
     val stateNoteList = viewModel.getStateNote.collectAsState()
     var search by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
-
 
     LaunchedEffect(Unit) {
         viewModel.loadNotes()
@@ -43,43 +45,51 @@ fun HomeScrean(
                 title = { Text(text = "Crud Spring") }
             )
         },
-
-
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    showDialog=true
-                }
-            ) {
+            FloatingActionButton(onClick = { showDialog = true }) {
                 Text("+", style = MaterialTheme.typography.titleLarge)
             }
         },
         content = { paddingValues ->
-            Box(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
 
-                CustomSearchTextField (
-                    search=search,
-                    onSearchChange = {search=it}
+
+                CustomSearchTextField(
+                    search = search,
+                    onSearchChange = { search = it }
                 )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
 
                 when {
                     stateNoteList.value.loading -> {
-                        CircularProgressIndicator(
-                            modifier = Modifier.align(Alignment.Center),
-                            color = Color.Red
-                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(top = 30.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = Color.Red)
+                        }
                     }
 
                     stateNoteList.value.error.isNotBlank() -> {
-                        Text(
-                            text = stateNoteList.value.error,
-                            color = Color.Red,
-                            modifier = Modifier.align(Alignment.Center)
-                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(top = 30.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = stateNoteList.value.error,
+                                color = Color.Red
+                            )
+                        }
                     }
 
                     else -> {
@@ -88,7 +98,10 @@ fun HomeScrean(
                             contentPadding = PaddingValues(12.dp),
                             verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            items(stateNoteList.value.noteList) { note ->
+                            items(stateNoteList.value.noteList.filter {
+                                it.titleNote.contains(search, ignoreCase = true) ||
+                                        it.contentNote.contains(search, ignoreCase = true)
+                            }) { note ->
                                 Card(
                                     modifier = Modifier.fillMaxWidth(),
                                     elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
@@ -101,10 +114,15 @@ fun HomeScrean(
                                             )
                                         )
                                         Spacer(modifier = Modifier.height(6.dp))
-                                        Text(
-                                            text = note.contentNote,
-                                            style = MaterialTheme.typography.bodyMedium
-                                        )
+                                        Row (modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween){
+                                            Text(
+                                                text = note.contentNote,
+                                                style = MaterialTheme.typography.bodyMedium
+                                            )
+                                            Icon(
+                                                modifier = Modifier.size(30.dp),
+                                                imageVector = Icons.Default.Close, contentDescription = "")
+                                        }
                                         Spacer(modifier = Modifier.height(8.dp))
                                         Text(
                                             text = note.createdAt,
@@ -121,16 +139,24 @@ fun HomeScrean(
         }
     )
 
+
     if (showDialog) {
         SaveNoteDialog(
             onDismiss = { showDialog = false },
             onSave = { title, content ->
                 showDialog = false
+                viewModel.saveNote(
+                    DtoMyNotesIU(
+                        titleNote = title,
+                        contentNote = content,
+                        isCompleted = false
+                    )
+                )
             }
         )
     }
-
 }
+
 
 
 

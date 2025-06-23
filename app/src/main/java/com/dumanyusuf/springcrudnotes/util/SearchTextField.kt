@@ -12,6 +12,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -26,7 +27,7 @@ fun CustomSearchTextField(
         onValueChange = onSearchChange,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+           .padding(horizontal = 16.dp),
         placeholder = { Text("Notlarda ara...") },
         shape = MaterialTheme.shapes.medium,
         trailingIcon = {

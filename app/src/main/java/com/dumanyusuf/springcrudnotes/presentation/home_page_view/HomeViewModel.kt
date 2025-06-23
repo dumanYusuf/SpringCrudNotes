@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dumanyusuf.springcrudnotes.data.remote.dto.toNoteModel
+import com.dumanyusuf.springcrudnotes.domain.model.DtoMyNotesIU
 import com.dumanyusuf.springcrudnotes.domain.use_case.get_notes.GetNotesUseCase
+import com.dumanyusuf.springcrudnotes.domain.use_case.post_use_case.SaveNoteUseCase
 import com.dumanyusuf.springcrudnotes.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,11 +14,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val getNotesUseCase: GetNotesUseCase
+    private val getNotesUseCase: GetNotesUseCase,
+    private val saveNoteUseCase: SaveNoteUseCase
 ) :ViewModel() {
 
 
@@ -44,6 +48,28 @@ class HomeViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
+
+
+    fun saveNote(notesIU: DtoMyNotesIU){
+        viewModelScope.launch {
+            Log.e("saveNote", "saveNote çağrıldı")
+            saveNoteUseCase.saveNote(notesIU).collect { result ->
+                when (result) {
+                    is Resource.Success -> {
+                        Log.e("saveNote", "Başarıyla kaydedildi: ${result.data}")
+                        loadNotes()
+                    }
+                    is Resource.Error -> {
+                        Log.e("saveNote", "Hata: ${result.message}")
+                    }
+                    is Resource.Loading -> {
+                        Log.d("saveNote", "Yükleniyor...")
+                    }
+                }
+            }
+        }
+    }
+
 
 
 }

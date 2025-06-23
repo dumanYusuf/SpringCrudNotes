@@ -50,6 +50,11 @@ fun HomeScrean(
     var selectedId by remember { mutableStateOf<Int>(0) }
 
 
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var deleteNoteId by remember { mutableStateOf<Int?>(null) }
+
+
+
     LaunchedEffect(Unit) {
         viewModel.loadNotes()
     }
@@ -150,7 +155,9 @@ fun HomeScrean(
                                                 modifier = Modifier
                                                     .size(30.dp)
                                                     .clickable {
-                                                        viewModel.deleteNote(note.id)
+                                                        deleteNoteId = note.id
+                                                        showDeleteDialog = true
+
                                                     },
                                                 imageVector = Icons.Default.Close, contentDescription = "")
                                         }
@@ -209,6 +216,37 @@ fun HomeScrean(
             }
         )
     }
+
+
+    if (showDeleteDialog && deleteNoteId != null) {
+        AlertDialog(
+            onDismissRequest = {  },
+            title = { Text("Silme Onayı") },
+            text = { Text("Bu notu silmek istediğinize emin misiniz?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.deleteNote(deleteNoteId!!)
+                        showDeleteDialog = false
+                        deleteNoteId = null
+                    }
+                ) {
+                    Text("Evet")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        deleteNoteId = null
+                    }
+                ) {
+                    Text("Hayır")
+                }
+            }
+        )
+    }
+
 
 
 }
